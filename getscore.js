@@ -141,6 +141,8 @@ function checkCrown()
 		scores.push(card.getAttribute("score"));
 	});
 	var maxScore = Math.max.apply(null,scores);
+	console.log(scores);
+	console.log(maxScore);
 	cards.forEach(function(card){
 		var score = card.getAttribute("score");
 		if(score==maxScore) $(card).find(".crown-img").show();
