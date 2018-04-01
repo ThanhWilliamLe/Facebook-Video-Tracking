@@ -1,4 +1,4 @@
-var accessToken = prompt("Input B110 access token.");
+//var accessToken = prompt("Input B110 access token.");
 $(document).ready(populateCards());
 
 function populateCards()
@@ -18,6 +18,7 @@ function populateCards()
 
 function getData(card, id)
 {
+	var accessToken = "EAACEdEose0cBABFSobxU8e8yytE202OZACP6qyJAn91hkASkCTPwbNFDZC8X5XvCHgtS01yWvXMlqecctX9ggAhH5FUOEU3dQ5fJXtVZBBlQwMCYxAWjZAYtoF4tnMkSRZBa3ghJTyDdIVWuQjx8uEdZCEgsPNZCw8UefoGEWyxZA5JFZBKWD5b5zMpZCAJMy2bGMv6wJrmZCS1kAZDZD";
 	$.get(
 		"https://graph.facebook.com/v2.12/196567220847751_" + id + "?" +
 		"fields=" +
@@ -32,6 +33,7 @@ function getData(card, id)
 		"&access_token=" + accessToken,
 		function (data)
 		{
+			/*
 			$.get(
 				"https://graph.facebook.com/v2.12/196567220847751_" + id + "/insights/post_impressions_viral?access_token=" + accessToken,
 				function (data2)
@@ -39,6 +41,8 @@ function getData(card, id)
 					putData(card, data, data2);
 				}
 			);
+			*/
+			putData(card,data,null);
 		}
 	);
 }
@@ -60,7 +64,7 @@ function putData(card, data1, data2)
 	infoList.innerHTML += '<li class="list-group-item" style="color: blue">Reactions: ' + data1.reactions.summary.total_count + '</li>';
 	infoList.innerHTML += '<li class="list-group-item" style="color: green">Shares: ' + data1.shares.count + '</li>';
 	infoList.innerHTML += '<li class="list-group-item" style="color: dimgrey">Comments: ' + data1.comments.summary.total_count + '</li>';
-	infoList.innerHTML += '<li class="list-group-item" style="color: orangered">Virality: ' + data2.data[0].values[0].value + '</li>';
+	if(data2!=null) infoList.innerHTML += '<li class="list-group-item" style="color: orangered">Virality: ' + data2.data[0].values[0].value + '</li>';
 
 
 	var score = data1.reactions.summary.total_count + 3 * data1.shares.count;
