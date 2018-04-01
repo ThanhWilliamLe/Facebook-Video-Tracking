@@ -3,19 +3,40 @@ $(document).ready(getAccessTokenAndPopulate());
 
 function getAccessTokenAndPopulate()
 {
-
-	var appAccessToken = "EAACEdEose0cBAEyC4PGfdJYU6G822BF5lNZCpvdcNyJMGdmDlxjVUwq08JhdWw7wSZBS0DqTYVlQx4FlHMmVuurNNj1I923wsaYL7uzNqnE0UaCAekyc8lcBAhTeO3PWnvbrpMvPtsTyGYZAZAvqpnj9I47pfY5WagyNrdba0yRF67nwU0fLEJP3oiwzMZAi61gafSDHV2gZDZD";
-	$.get("https://graph.facebook.com/v2.12/me/accounts?access_token=" + appAccessToken,
-		function (data)
+	$.get("./accesstoken",
+		function (token)
 		{
-			data.data.forEach(function (val)
-			{
-				if (val.name == "B110 Dance Team")
+			var userAccessToken = "$EAACEdEose0cBAEyC4PGfdJYU6G822BF5lNZCpvdcNyJMGdmDlxjVUwq08JhdWw7wSZBS0DqTYVlQx4FlHMmVuurNNj1I923wsaYL7uzNqnE0UaCAekyc8lcBAhTeO3PWnvbrpMvPtsTyGYZAZAvqpnj9I47pfY5WagyNrdba0yRF67nwU0fLEJP3oiwzMZAi61gafSDHV2gZDZD";
+			if (token != null) userAccessToken = token;
+			$.get({
+				url: "https://graph.facebook.com/v2.12/me/accounts?access_token=" + userAccessToken,
+				success: function (data)
 				{
-					populateCards(val.access_token);
-					return;
+					data.data.forEach(function (val)
+					{
+						if (val.name == "B110 Dance Team")
+						{
+							populateCards(val.access_token);
+							return;
+						}
+					})
+				},
+				error: function (e)
+				{
+					var newToken = window.prompt("New user access token?");
+					if(newToken.length>10)
+					{
+						$.post(
+							"./accesstoken.php",
+							{"token": newToken},
+							function (result)
+							{
+								console.log(result);
+								getAccessTokenAndPopulate();
+							});
+					}
 				}
-			})
+			});
 		});
 }
 
