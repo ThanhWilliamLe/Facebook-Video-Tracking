@@ -1,13 +1,12 @@
 //var accessToken = prompt("Input B110 access token.");
 $(document).ready(getAccessTokenAndPopulate());
+var cards = [];
 
 function getAccessTokenAndPopulate()
 {
 	$.get("./accesstoken",
-		function (token)
+		function (userAccessToken)
 		{
-			var userAccessToken = "$EAACEdEose0cBAEyC4PGfdJYU6G822BF5lNZCpvdcNyJMGdmDlxjVUwq08JhdWw7wSZBS0DqTYVlQx4FlHMmVuurNNj1I923wsaYL7uzNqnE0UaCAekyc8lcBAhTeO3PWnvbrpMvPtsTyGYZAZAvqpnj9I47pfY5WagyNrdba0yRF67nwU0fLEJP3oiwzMZAi61gafSDHV2gZDZD";
-			if (token != null) userAccessToken = token;
 			$.get({
 				url: "https://graph.facebook.com/v2.12/me/accounts?access_token=" + userAccessToken,
 				success: function (data)
@@ -24,7 +23,7 @@ function getAccessTokenAndPopulate()
 				error: function (e)
 				{
 					var newToken = window.prompt("New user access token?");
-					if(newToken.length>10)
+					if (newToken.length > 10)
 					{
 						$.post(
 							"./accesstoken.php",
@@ -51,6 +50,7 @@ function populateCards(accessToken)
 		var card = cardTemplate.cloneNode(true);
 		card.id += cardCount++;
 		card.classList.toggle("none", false);
+		cards.push(card);
 		populateCardData(accessToken, card, id);
 	});
 }
@@ -78,13 +78,13 @@ function populateCardData(accessToken, card, id)
 				"post_video_views," +
 				"post_negative_feedback," +
 				"post_video_avg_time_watched," +
-				"post_video_length," +
-				"post_video_view_time" +
+				"post_video_length" +
 				"?access_token=" + accessToken,
 				function (data2)
 				{
 					putData(card, data, data2);
 					$("#cards")[0].appendChild(card);
+					checkCrown();
 				}
 			);
 		}
@@ -93,8 +93,8 @@ function populateCardData(accessToken, card, id)
 
 function putData(card, data1, data2)
 {
-	console.log(data1);
-	console.log(data2);
+	//console.log(data1);
+	//console.log(data2);
 	$(card).find(".card-img-top")[0].src = data1["full_picture"];
 	$(card).find(".post-link").each(function (i, a)
 	{
@@ -111,16 +111,39 @@ function putData(card, data1, data2)
 	var views = data2.data[2].values[0].value;
 	var virality = data2.data[0].values[0].value;
 	var negative = data2.data[3].values[0].value;
+	var view_avg = Math.round(data2.data[4].values[0].value * 100 / data2.data[5].values[0].value);
 	var score = reactions + 3 * shares;
+	card.setAttribute("score", score);
 
-	infoList.innerHTML += '<li class="list-group-item" style="color: blue">Reactions: ' + reactions + '</li>';
-	infoList.innerHTML += '<li class="list-group-item" style="color: green">Shares: ' + shares + '</li>';
-	infoList.innerHTML += '<li class="list-group-item" style="color: dimgrey">Comments: ' + comments + '</li>';
-	if (data2 != null)
-	{
-		infoList.innerHTML += '<li class="list-group-item" style="color: hotpink">Views: ' + views + '</li>';
-		infoList.innerHTML += '<li class="list-group-item" style="color: teal">Virality: ' + virality + '</li>';
-		infoList.innerHTML += '<li class="list-group-item" style="color: red">Negative: ' + negative + '</li>';
-	}
-	infoList.innerHTML += '<li class="list-group-item" style="color: gold;text-align: right"><b>Total score: ' + score + '</b></li>';
+	addListItem(infoList, "blue", 'Reactions: ' + reactions + ' (+' + reactions + ' score)');
+	addListItem(infoList, "blue", 'Shares: ' + shares + ' (+' + shares * 3 + ' score)');
+	addListItem(infoList, "hotpink", 'Views: ' + views);
+	addListItem(infoList, "hotpink", 'Average view: ' + view_avg + '% video length');
+	addListItem(infoList, "green", 'Virality: ' + virality);
+	addListItem(infoList, "green", 'Comments: ' + comments);
+	addListItem(infoList, "red", 'Negative: ' + negative);
+	addListItem(infoList, "gold", '<b>Total score: ' + score + '</b>', true);
+}
+
+function addListItem(infoList, color, string, rightAlign)
+{
+	infoList.innerHTML += '<li ' +
+		'class="list-group-item" ' +
+		'style="color: ' + color + (rightAlign ? ";text-align:right" : "") + '">' +
+		string +
+		'</li>';
+}
+
+function checkCrown()
+{
+	var scores = [];
+	cards.forEach(function(card){
+		scores.push(card.getAttribute("score"));
+	});
+	var maxScore = Math.max.apply(null,scores);
+	cards.forEach(function(card){
+		var score = card.getAttribute("score");
+		if(score==maxScore) $(card).find(".crown-img").show();
+		else $(card).find(".crown-img").hide();
+	});
 }
