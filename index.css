@@ -1,24 +1,22 @@
-html, body, #cards
-{
+html, body, #cards {
 	height: 100%;
 	background: black;
 	justify-content: center;
 }
 
-.none
-{
-	display:none;
+.none {
+	display: none;
 }
 
-#cards
-{
+#cards {
 	padding: 2em;
 	display: flex;
 	justify-content: space-evenly;
+	flex-wrap: wrap;
+	align-items: stretch;
 }
 
-#cards-bg
-{
+#cards-bg {
 	position: absolute;
 	height: 100%;
 	width: 100%;
@@ -31,15 +29,19 @@ html, body, #cards
 	background-size: cover;
 }
 
-.post-card
-{
-	margin: auto;
-	max-width: 20em;
+.post-card {
+	margin: 2em 0;
+	max-width: 25em;
 	box-shadow: 3px 3px 5px #00000044;
 }
 
-.post-message
-{
+@media (max-width: 1024px) {
+	.post-card {
+		max-width: 50em;
+	}
+}
+
+.post-message {
 	height: available;
 	white-space: nowrap;
 	overflow: hidden;
