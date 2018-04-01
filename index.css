@@ -1,0 +1,47 @@
+html, body, #cards
+{
+	height: 100%;
+	background: black;
+	justify-content: center;
+}
+
+.none
+{
+	display:none;
+}
+
+#cards
+{
+	padding: 2em;
+	display: flex;
+	justify-content: space-evenly;
+}
+
+#cards-bg
+{
+	position: absolute;
+	height: 100%;
+	width: 100%;
+	top: 0;
+	left: 0;
+	right: 0;
+	bottom: 0;
+	background: url("B110Logo.jpg") no-repeat center;
+	filter: blur(10px);
+	background-size: cover;
+}
+
+.post-card
+{
+	margin: auto;
+	max-width: 20em;
+	box-shadow: 3px 3px 5px #00000044;
+}
+
+.post-message
+{
+	height: available;
+	white-space: nowrap;
+	overflow: hidden;
+	text-overflow: ellipsis;
+}
