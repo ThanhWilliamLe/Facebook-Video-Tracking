@@ -1,6 +1,7 @@
 //var accessToken = prompt("Input B110 access token.");
 $(document).ready(getAccessTokenAndPopulate());
 var cards = [];
+var cardsData = {};
 
 function getAccessTokenAndPopulate()
 {
@@ -8,7 +9,7 @@ function getAccessTokenAndPopulate()
 		function (userAccessToken)
 		{
 			$.get({
-				url: "https://graph.facebook.com/v2.12/me/accounts?access_token=" + userAccessToken,
+				url: "https://graph.facebook.com/v2.12/813353818730539/accounts?access_token=" + userAccessToken,
 				success: function (data)
 				{
 					data.data.forEach(function (val)
@@ -41,7 +42,8 @@ function getAccessTokenAndPopulate()
 
 function populateCards(accessToken)
 {
-
+	cards = [];
+	cardsData = {};
 	var cardCount = 1;
 	var postIds = $("#posts")[0].innerHTML.split(",");
 	var cardTemplate = $("#pc-0")[0];
@@ -57,6 +59,7 @@ function populateCards(accessToken)
 
 function populateCardData(accessToken, card, id)
 {
+	cardsData[id] = [null, null];
 	$.get(
 		"https://graph.facebook.com/v2.12/196567220847751_" + id + "?" +
 		"fields=" +
@@ -71,24 +74,36 @@ function populateCardData(accessToken, card, id)
 		"&access_token=" + accessToken,
 		function (data)
 		{
-
-			$.get(
-				"https://graph.facebook.com/v2.12/196567220847751_" + id + "/insights/" +
-				"post_impressions_viral," +
-				"post_video_views," +
-				"post_negative_feedback," +
-				"post_video_avg_time_watched," +
-				"post_video_length" +
-				"?access_token=" + accessToken,
-				function (data2)
-				{
-					putData(card, data, data2);
-					$("#cards")[0].appendChild(card);
-					checkCrown();
-				}
-			);
+			cardsData[id][0] = data;
+			checkEnoughDataAndPut(card, id);
 		}
 	);
+
+	$.get(
+		"https://graph.facebook.com/v2.12/196567220847751_" + id + "/insights/" +
+		"post_impressions_viral," +
+		"post_video_views," +
+		"post_negative_feedback," +
+		"post_video_avg_time_watched," +
+		"post_video_length" +
+		"?access_token=" + accessToken,
+		function (data2)
+		{
+			cardsData[id][1] = data2;
+			checkEnoughDataAndPut(card, id);
+		}
+	);
+}
+
+function checkEnoughDataAndPut(card, id)
+{
+	var datas = cardsData[id];
+	if (datas[0] != null && datas[1] != null)
+	{
+		putData(card, datas[0], datas[1]);
+		$("#cards")[0].appendChild(card);
+		checkCrown();
+	}
 }
 
 function putData(card, data1, data2)
@@ -137,15 +152,17 @@ function addListItem(infoList, color, string, rightAlign)
 function checkCrown()
 {
 	var scores = [];
-	cards.forEach(function(card){
+	cards.forEach(function (card)
+	{
 		scores.push(card.getAttribute("score"));
 	});
-	var maxScore = Math.max.apply(null,scores);
+	var maxScore = Math.max.apply(null, scores);
 	console.log(scores);
 	console.log(maxScore);
-	cards.forEach(function(card){
+	cards.forEach(function (card)
+	{
 		var score = card.getAttribute("score");
-		if(score==maxScore) $(card).find(".crown-img").show();
+		if (score == maxScore) $(card).find(".crown-img").show();
 		else $(card).find(".crown-img").hide();
 	});
 }
