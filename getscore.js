@@ -32,7 +32,7 @@ function getAccessTokenAndPopulate()
 							function (result)
 							{
 								console.log(result);
-								getAccessTokenAndPopulate();
+								location.reload(true);
 							});
 					}
 				}
